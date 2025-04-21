@@ -1,4 +1,3 @@
-// app/page.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -6,14 +5,11 @@ import React, { useState } from "react";
 export default function Base7Calculator() {
   const [firstOperand, setFirstOperand] = useState<string>("");
   const [operator, setOperator] = useState<string>("");
-  const [secondOperand, setSecondOperand] = useState<string>("");
   const [result, setResult] = useState<string>("");
   const [display, setDisplay] = useState<string>("0");
   const [resetDisplay, setResetDisplay] = useState<boolean>(false);
 
-  const isValidBase7 = (value: string): boolean => {
-    return /^[0-6]+$/.test(value);
-  };
+  const isValidBase7 = (value: string): boolean => /^[0-6]+$/.test(value);
 
   const handleDigitClick = (digit: string): void => {
     if (resetDisplay) {
@@ -25,14 +21,9 @@ export default function Base7Calculator() {
   };
 
   const handleOperatorClick = (op: string): void => {
-    if (result) {
-      setFirstOperand(result);
-      setResult("");
-    } else {
-      setFirstOperand(display);
-    }
-
+    setFirstOperand(result || display);
     setOperator(op);
+    setResult("");
     setResetDisplay(true);
   };
 
@@ -40,7 +31,6 @@ export default function Base7Calculator() {
     setDisplay("0");
     setFirstOperand("");
     setOperator("");
-    setSecondOperand("");
     setResult("");
     setResetDisplay(false);
   };
@@ -49,61 +39,28 @@ export default function Base7Calculator() {
     setDisplay(display.length > 1 ? display.slice(0, -1) : "0");
   };
 
-  const addBase7 = (a: string, b: string): string => {
-    const num1 = parseInt(a, 7);
-    const num2 = parseInt(b, 7);
-    const sum = num1 + num2;
-    return sum.toString(7);
-  };
-
-  const subtractBase7 = (a: string, b: string): string => {
-    const num1 = parseInt(a, 7);
-    const num2 = parseInt(b, 7);
-    const difference = num1 - num2;
-    return difference.toString(7);
-  };
-
-  const multiplyBase7 = (a: string, b: string): string => {
-    const num1 = parseInt(a, 7);
-    const num2 = parseInt(b, 7);
-    const product = num1 * num2;
-    return product.toString(7);
-  };
-
+  const addBase7 = (a: string, b: string): string => (parseInt(a, 7) + parseInt(b, 7)).toString(7);
+  const subtractBase7 = (a: string, b: string): string => (parseInt(a, 7) - parseInt(b, 7)).toString(7);
+  const multiplyBase7 = (a: string, b: string): string => (parseInt(a, 7) * parseInt(b, 7)).toString(7);
   const divideBase7 = (a: string, b: string): string => {
-    const num1 = parseInt(a, 7);
     const num2 = parseInt(b, 7);
     if (num2 === 0) return "Error";
-    const quotient = Math.floor(num1 / num2);
-    return quotient.toString(7);
+    return Math.floor(parseInt(a, 7) / num2).toString(7);
   };
 
   const handleEquals = (): void => {
-    if (!firstOperand || !operator) return;
-
-    if (!isValidBase7(display)) {
+    if (!firstOperand || !operator || !isValidBase7(display)) {
       setDisplay("Invalid base-7");
       return;
     }
 
-    setSecondOperand(display);
-    let calculatedResult: string;
-
+    let calculatedResult = "";
     switch (operator) {
-      case "+":
-        calculatedResult = addBase7(firstOperand, display);
-        break;
-      case "-":
-        calculatedResult = subtractBase7(firstOperand, display);
-        break;
-      case "×":
-        calculatedResult = multiplyBase7(firstOperand, display);
-        break;
-      case "÷":
-        calculatedResult = divideBase7(firstOperand, display);
-        break;
-      default:
-        return;
+      case "+": calculatedResult = addBase7(firstOperand, display); break;
+      case "-": calculatedResult = subtractBase7(firstOperand, display); break;
+      case "×": calculatedResult = multiplyBase7(firstOperand, display); break;
+      case "÷": calculatedResult = divideBase7(firstOperand, display); break;
+      default: return;
     }
 
     setResult(calculatedResult);
@@ -118,66 +75,33 @@ export default function Base7Calculator() {
           <div className="text-gray-500 text-sm mb-1">
             {operator ? `${firstOperand} ${operator} ${resetDisplay ? "" : display}` : ""}
           </div>
-          <div className="text-3xl font-medium text-gray-800 truncate">
-            {display}
-          </div>
+          <div className="text-3xl font-medium text-gray-800 truncate">{display}</div>
         </div>
 
         <div className="grid grid-cols-4 gap-3 mb-4">
-          <button onClick={() => handleClear()} className="col-span-2 py-3 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg shadow-md transition-all">
-            AC
-          </button>
-          <button onClick={() => handleDelete()} className="py-3 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-lg shadow-md transition-all">
-            DEL
-          </button>
-          <button onClick={() => handleOperatorClick("÷")} className="py-3 bg-indigo-500 hover:bg-indigo-600 text-white font-medium rounded-lg shadow-md transition-all">
-            ÷
-          </button>
+          <button onClick={handleClear} className="col-span-2 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg shadow-md">AC</button>
+          <button onClick={handleDelete} className="py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-md">DEL</button>
+          <button onClick={() => handleOperatorClick("÷")} className="py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg shadow-md">÷</button>
         </div>
 
         <div className="grid grid-cols-4 gap-3 mb-4">
-          {[1, 2, 3].map((num) => (
-            <button 
-              key={num} 
-              onClick={() => handleDigitClick(num.toString())}
-              className="py-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg shadow-md transition-all"
-            >
-              {num}
-            </button>
+          {[1, 2, 3].map(num => (
+            <button key={num} onClick={() => handleDigitClick(num.toString())} className="py-4 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow-md">{num}</button>
           ))}
-          <button onClick={() => handleOperatorClick("×")} className="py-4 bg-indigo-500 hover:bg-indigo-600 text-white font-medium rounded-lg shadow-md transition-all">
-            ×
-          </button>
+          <button onClick={() => handleOperatorClick("×")} className="py-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg shadow-md">×</button>
         </div>
 
         <div className="grid grid-cols-4 gap-3 mb-4">
-          {[4, 5, 6].map((num) => (
-            <button 
-              key={num} 
-              onClick={() => handleDigitClick(num.toString())}
-              className="py-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg shadow-md transition-all"
-            >
-              {num}
-            </button>
+          {[4, 5, 6].map(num => (
+            <button key={num} onClick={() => handleDigitClick(num.toString())} className="py-4 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow-md">{num}</button>
           ))}
-          <button onClick={() => handleOperatorClick("-")} className="py-4 bg-indigo-500 hover:bg-indigo-600 text-white font-medium rounded-lg shadow-md transition-all">
-            -
-          </button>
+          <button onClick={() => handleOperatorClick("-")} className="py-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg shadow-md">-</button>
         </div>
 
         <div className="grid grid-cols-4 gap-3">
-          <button 
-            onClick={() => handleDigitClick("0")} 
-            className="py-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg shadow-md transition-all"
-          >
-            0
-          </button>
-          <button onClick={() => handleEquals()} className="col-span-2 py-4 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-medium rounded-lg shadow-md transition-all">
-            =
-          </button>
-          <button onClick={() => handleOperatorClick("+")} className="py-4 bg-indigo-500 hover:bg-indigo-600 text-white font-medium rounded-lg shadow-md transition-all">
-            +
-          </button>
+          <button onClick={() => handleDigitClick("0")} className="py-4 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow-md">0</button>
+          <button onClick={handleEquals} className="col-span-2 py-4 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white rounded-lg shadow-md">=</button>
+          <button onClick={() => handleOperatorClick("+")} className="py-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg shadow-md">+</button>
         </div>
 
         <div className="mt-4 text-center text-xs text-gray-500">
