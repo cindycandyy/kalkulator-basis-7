@@ -1,4 +1,6 @@
+// app/page.tsx
 "use client";
+
 import React, { useState } from "react";
 
 export default function Base7Calculator() {
@@ -29,7 +31,7 @@ export default function Base7Calculator() {
     } else {
       setFirstOperand(display);
     }
-    
+
     setOperator(op);
     setResetDisplay(true);
   };
@@ -46,28 +48,28 @@ export default function Base7Calculator() {
   const handleDelete = (): void => {
     setDisplay(display.length > 1 ? display.slice(0, -1) : "0");
   };
-  
+
   const addBase7 = (a: string, b: string): string => {
     const num1 = parseInt(a, 7);
     const num2 = parseInt(b, 7);
     const sum = num1 + num2;
     return sum.toString(7);
   };
-  
+
   const subtractBase7 = (a: string, b: string): string => {
     const num1 = parseInt(a, 7);
     const num2 = parseInt(b, 7);
     const difference = num1 - num2;
     return difference.toString(7);
   };
-  
+
   const multiplyBase7 = (a: string, b: string): string => {
     const num1 = parseInt(a, 7);
     const num2 = parseInt(b, 7);
     const product = num1 * num2;
     return product.toString(7);
   };
-  
+
   const divideBase7 = (a: string, b: string): string => {
     const num1 = parseInt(a, 7);
     const num2 = parseInt(b, 7);
@@ -78,10 +80,15 @@ export default function Base7Calculator() {
 
   const handleEquals = (): void => {
     if (!firstOperand || !operator) return;
-    
+
+    if (!isValidBase7(display)) {
+      setDisplay("Invalid base-7");
+      return;
+    }
+
     setSecondOperand(display);
     let calculatedResult: string;
-    
+
     switch (operator) {
       case "+":
         calculatedResult = addBase7(firstOperand, display);
@@ -98,7 +105,7 @@ export default function Base7Calculator() {
       default:
         return;
     }
-    
+
     setResult(calculatedResult);
     setDisplay(calculatedResult);
     setResetDisplay(true);
@@ -115,7 +122,7 @@ export default function Base7Calculator() {
             {display}
           </div>
         </div>
-        
+
         <div className="grid grid-cols-4 gap-3 mb-4">
           <button onClick={() => handleClear()} className="col-span-2 py-3 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg shadow-md transition-all">
             AC
@@ -127,7 +134,7 @@ export default function Base7Calculator() {
             ÷
           </button>
         </div>
-        
+
         <div className="grid grid-cols-4 gap-3 mb-4">
           {[1, 2, 3].map((num) => (
             <button 
@@ -142,7 +149,7 @@ export default function Base7Calculator() {
             ×
           </button>
         </div>
-        
+
         <div className="grid grid-cols-4 gap-3 mb-4">
           {[4, 5, 6].map((num) => (
             <button 
@@ -157,7 +164,7 @@ export default function Base7Calculator() {
             -
           </button>
         </div>
-        
+
         <div className="grid grid-cols-4 gap-3">
           <button 
             onClick={() => handleDigitClick("0")} 
@@ -172,7 +179,7 @@ export default function Base7Calculator() {
             +
           </button>
         </div>
-        
+
         <div className="mt-4 text-center text-xs text-gray-500">
           <p>Kalkulator Basis-7 (Hanya angka 0-6)</p>
         </div>
